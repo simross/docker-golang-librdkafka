@@ -5,10 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and publish docker image
     steps:
+    - name: Login to docker packages
+      run: docker login docker.pkg.github.com --username ${{ secrets.GITHUB_PACKAGE_REGISTRY_USER }} --password ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout
       uses: actions/checkout@v1
     - name: Extract branch name
       shell: bash
       run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
-    - name: Echoing brach name
-      run: echo "${BRANCH_NAME}"
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag docker.pkg.github.com/simross/docker-golang-librdkafka:${BRANCH_NAME}
+    - name: Push docker image
+      run: docker push docker.pkg.github.com/simross/docker-golang-librdkafka:${BRANCH_NAME}
