@@ -21,5 +21,6 @@ jobs:
         docker tag docker.pkg.github.com/${{ secrets.GITHUB_PACKAGE_REGISTRY_USER }}/docker-golang-librdkafka/base:${BRANCH_NAME} ${{secrets.DOCKERHUB_REPOSITORY}}:${BRANCH_NAME}
         echo ${{secrets.DOCKERHUB_TOKEN}} | docker login --username ${{secrets.DOCKERHUB_USERNAME}} --password-stdin
         docker push ${{secrets.DOCKERHUB_REPOSITORY}}:${BRANCH_NAME}
+        rm -f ${HOME}/.docker/config.json
 
 
