@@ -5,20 +5,15 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and publish docker image
     steps:
-    - name: Login to docker packages
-      run: docker login docker.pkg.github.com --username ${{ secrets.GITHUB_PACKAGE_REGISTRY_USER }} --password ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout
       uses: actions/checkout@v1
     - name: Extract branch name
       shell: bash
       run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag docker.pkg.github.com/${{ secrets.GITHUB_PACKAGE_REGISTRY_USER }}/docker-golang-librdkafka/base:${BRANCH_NAME}
-    - name: Push docker image to github packages
-      run: docker push docker.pkg.github.com/${{ secrets.GITHUB_PACKAGE_REGISTRY_USER }}/docker-golang-librdkafka/base:${BRANCH_NAME}
+      run: docker build . --file Dockerfile --tag ${{secrets.DOCKERHUB_REPOSITORY}}:${BRANCH_NAME}
     - name: Push docker image to dockerhub
       run: |
-        docker tag docker.pkg.github.com/${{ secrets.GITHUB_PACKAGE_REGISTRY_USER }}/docker-golang-librdkafka/base:${BRANCH_NAME} ${{secrets.DOCKERHUB_REPOSITORY}}:${BRANCH_NAME}
         echo ${{secrets.DOCKERHUB_TOKEN}} | docker login --username ${{secrets.DOCKERHUB_USERNAME}} --password-stdin
         docker push ${{secrets.DOCKERHUB_REPOSITORY}}:${BRANCH_NAME}
         rm -f ${HOME}/.docker/config.json
